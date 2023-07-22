@@ -22,7 +22,7 @@ export const onTransaction: OnTransactionHandler = async ({ transaction }) => {
       text(
         `${info.riskList.length} risk item`,
       ),
-      heading('Risk List'),
+      heading(`${info.riskList.length ? 'Risk List' : ''}`),
       ...info.riskList.map((item, i) => text(`${i + 1} ${item.text}`)),
       divider(),
       text(

@@ -119,10 +119,10 @@ export const getRiskListFun = async (info) => {
   let address = res[1].address
   let tx = res[1].tx
   if (deploy?.risk === true) {
-    info.riskList.push({risk: true, text: 'deploy', timestamp: deploy.timestamp})
+    info.riskList.push({risk: true, text: 'recently deployed', timestamp: deploy.timestamp})
   }
   if (update?.risk === true) {
-    info.riskList.push({risk: true, text: 'update', timestamp: update.timestamp})
+    info.riskList.push({risk: true, text: 'recently updated', timestamp: update.timestamp})
   }
   if (address?.risk === true) {
     info.riskList.push({risk: true, text: 'less address', amount: address.amount, desc: `only ${address.amount} address`})
