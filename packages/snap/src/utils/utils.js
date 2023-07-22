@@ -72,3 +72,21 @@ export const getSourceCode = async (contract) => {
   }
   return contract
 }
+
+export const setShortUrl = async (contract) => {
+  let data = await fetcher(`https://api.dappreader.com/v1/set_short_url`, {
+    method: 'POST',
+    body: JSON.stringify({
+      "chain_id": contract.chain.chainId,
+      "contract_address": contract.to,
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  console.log(data)
+  if (data.code == 0) {
+    contract.token = data.short_url_token
+  }
+  return contract
+}

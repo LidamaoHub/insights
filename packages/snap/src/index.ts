@@ -1,7 +1,7 @@
-import { OnTransactionHandler } from '@metamask/snaps-types';
-import { heading, panel, text } from '@metamask/snaps-ui';
+import { OnTransactionHandler, OnRpcRequestHandler } from '@metamask/snaps-types';
+import { heading, panel, text, copyable, divider } from '@metamask/snaps-ui';
 import { ethers } from 'ethers';
-import { getContractInfo, getSourceCode } from './utils/utils.js';
+import { getContractInfo, setShortUrl } from './utils/utils.js';
 
 // Handle outgoing transactions.
 export const onTransaction: OnTransactionHandler = async ({ transaction }) => {
@@ -9,18 +9,18 @@ export const onTransaction: OnTransactionHandler = async ({ transaction }) => {
   let info = await getContractInfo(transaction, p)
   let network = await p.getNetwork()
   info.chain = network
-  info = await getSourceCode(info)
-  console.log('info', info)
+  info = await setShortUrl(info)
+  console.log(info)
   return {
     content: panel([
-      heading('Is Proxy'),
+      heading('Risk List'),
+      divider(),
       text(
-        `${info.isProxy ? 'Yes' : 'No'}`,
+        `More audit info from the following url`,
       ),
-      heading('Is OpenSoure'),
-      text(
-        `${info.openStatus}`,
-      ),
+      copyable(
+        `https://contract-info.pages.dev/mm${info.token}`,
+      )
     ])
   };
 };
