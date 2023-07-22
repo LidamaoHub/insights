@@ -90,3 +90,45 @@ export const setShortUrl = async (contract) => {
   }
   return contract
 }
+
+export const getRiskListFun = async (info) => {
+  let res = await Promise.all([
+    fetcher(`https://api.dappreader.com/v1/get_proxy_update_count`, {
+      method: 'POST',
+      body: JSON.stringify({
+        admin_address: info.adminAddress,
+        chain_id: info.chain.chainId
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }), 
+    fetcher(`https://api.dappreader.com/v1/get_tx_amount`, {
+      method: 'POST',
+      body: JSON.stringify({
+        contract_address: info.to,
+        chain_id: info.chain.chainId
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  ])
+  let deploy = res[0].deploy
+  let update = res[0].update
+  let address = res[1].address
+  let tx = res[1].tx
+  if (deploy?.risk === true) {
+    info.riskList.push({risk: true, text: 'deploy', timestamp: deploy.timestamp})
+  }
+  if (update?.risk === true) {
+    info.riskList.push({risk: true, text: 'update', timestamp: update.timestamp})
+  }
+  if (address?.risk === true) {
+    info.riskList.push({risk: true, text: 'less address', amount: address.amount, desc: `only ${address.amount} address`})
+  }
+  if (tx?.risk === true) {
+    info.riskList.push({risk: true, text: 'less transaction', amount: tx.amount, desc: `only ${tx.amount} transaction`})
+  }
+  return info
+}
