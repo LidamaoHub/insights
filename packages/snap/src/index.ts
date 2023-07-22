@@ -6,7 +6,7 @@ import { getContractInfo, setShortUrl } from './utils/utils.js';
 // Handle outgoing transactions.
 export const onTransaction: OnTransactionHandler = async ({ transaction }) => {
   let p = await new ethers.providers.Web3Provider(window.ethereum, "any");
-  let info = await getContractInfo(transaction, p)
+  let info = {chain: {}, token: '', to: transaction.to}
   let network = await p.getNetwork()
   info.chain = network
   info = await setShortUrl(info)
