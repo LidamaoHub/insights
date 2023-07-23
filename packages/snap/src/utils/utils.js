@@ -57,17 +57,21 @@ export const getSourceCode = async (contract) => {
     if (!name) {
       contract.sources = null
     }
-    let data = await fetcher(`https://${name}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${apiKey}`)
-    let result = data.result
-    if (data.status == 1) {
-      result = result[0]
-      if (result.SourceCode) {
-        contract.isOpenSources = true
+    try {
+      let data = await fetcher(`https://${name}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${apiKey}`)
+      let result = data.result
+      if (data.status == 1) {
+        result = result[0]
+        if (result.SourceCode) {
+          contract.isOpenSources = true
+        } else {
+          contract.isOpenSources = false
+        }
       } else {
         contract.isOpenSources = false
       }
-    } else {
-      contract.isOpenSources = false
+    } catch (error) {
+      console.log(error)
     }
   }
   return contract
@@ -128,25 +132,30 @@ export const getRiskListFun = async (info) => {
   } else {
     arr = [setShortUrl]
   }
-  let res = await Promise.all(arr)
-  if (res[0].code == 0) {
-    info.token = res[0].short_url_token
+  try {
+    let res = await Promise.all(arr)
+    if (res[0].code == 0) {
+      info.token = res[0].short_url_token
+    }
+    let deploy = res[1]?.deploy
+    let update = res[1]?.update
+    let address = res[2]?.address
+    let tx = res[2]?.tx
+    if (deploy?.risk === true) {
+      info.riskList.push({risk: true, text: 'recently deployed', timestamp: deploy.timestamp})
+    }
+    if (update?.risk === true) {
+      info.riskList.push({risk: true, text: 'recently updated', timestamp: update.timestamp})
+    }
+    if (address?.risk === true) {
+      info.riskList.push({risk: true, text: 'less address', amount: address.amount, desc: `only ${address.amount} address`})
+    }
+    if (tx?.risk === true) {
+      info.riskList.push({risk: true, text: 'less transaction', amount: tx.amount, desc: `only ${tx.amount} transaction`})
+    }
+  } catch (error) {
+    console.log(error)
   }
-  let deploy = res[1]?.deploy
-  let update = res[1]?.update
-  let address = res[2]?.address
-  let tx = res[2]?.tx
-  if (deploy?.risk === true) {
-    info.riskList.push({risk: true, text: 'recently deployed', timestamp: deploy.timestamp})
-  }
-  if (update?.risk === true) {
-    info.riskList.push({risk: true, text: 'recently updated', timestamp: update.timestamp})
-  }
-  if (address?.risk === true) {
-    info.riskList.push({risk: true, text: 'less address', amount: address.amount, desc: `only ${address.amount} address`})
-  }
-  if (tx?.risk === true) {
-    info.riskList.push({risk: true, text: 'less transaction', amount: tx.amount, desc: `only ${tx.amount} transaction`})
-  }
+  
   return info
 }
