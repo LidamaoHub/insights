@@ -44,7 +44,7 @@ export const getSourceCode = async (contract) => {
   let address = contract.proxyAddress || contract.to
   let chain = contract.chain
   if (!(chain.chainId == 1 || chain.chainId == 42 || chain.chainId == 3 || chain.chainId == 5 || chain.chainId == 11155111)) {
-    contract.openStatus = 'unknown'
+    contract.isOpenSources = false
   } else {
     let apiKey = '19SE5KR1KSVTIYMRTBJ8VQ3UJGGVFKIK5W'
     let name = 'api'
@@ -62,12 +62,12 @@ export const getSourceCode = async (contract) => {
     if (data.status == 1) {
       result = result[0]
       if (result.SourceCode) {
-        contract.openStatus = 'Yes'
+        contract.isOpenSources = true
       } else {
-        contract.openStatus = 'No'
+        contract.isOpenSources = false
       }
     } else {
-      contract.openStatus = 'No'
+      contract.isOpenSources = false
     }
   }
   return contract
@@ -92,32 +92,50 @@ export const setShortUrl = async (contract) => {
 }
 
 export const getRiskListFun = async (info) => {
-  let res = await Promise.all([
-    fetcher(`https://api.dappreader.com/v1/get_proxy_update_count`, {
-      method: 'POST',
-      body: JSON.stringify({
-        admin_address: info.adminAddress,
-        chain_id: info.chain.chainId
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }), 
-    fetcher(`https://api.dappreader.com/v1/get_tx_amount`, {
-      method: 'POST',
-      body: JSON.stringify({
-        contract_address: info.to,
-        chain_id: info.chain.chainId
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-  ])
-  let deploy = res[0].deploy
-  let update = res[0].update
-  let address = res[1].address
-  let tx = res[1].tx
+  let setShortUrl = fetcher(`https://api.dappreader.com/v1/set_short_url`, {
+    method: 'POST',
+    body: JSON.stringify({
+      "chain_id": info.chain.chainId,
+      "contract_address": info.to,
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  let getProxyUpdateCount = fetcher(`https://api.dappreader.com/v1/get_proxy_update_count`, {
+    method: 'POST',
+    body: JSON.stringify({
+      admin_address: info.adminAddress,
+      chain_id: info.chain.chainId
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  let getTxAmount = fetcher(`https://api.dappreader.com/v1/get_tx_amount`, {
+    method: 'POST',
+    body: JSON.stringify({
+      contract_address: info.to,
+      chain_id: info.chain.chainId
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  let arr = []
+  if (info.isProxy) {
+    arr = [setShortUrl, getProxyUpdateCount, getTxAmount]
+  } else {
+    arr = [setShortUrl]
+  }
+  let res = await Promise.all(arr)
+  if (res[0].code == 0) {
+    info.token = res[0].short_url_token
+  }
+  let deploy = res[1]?.deploy
+  let update = res[1]?.update
+  let address = res[2]?.address
+  let tx = res[2]?.tx
   if (deploy?.risk === true) {
     info.riskList.push({risk: true, text: 'recently deployed', timestamp: deploy.timestamp})
   }
