@@ -11,12 +11,12 @@ export const onTransaction: OnTransactionHandler = async ({ transaction }) => {
   info.chain = network
   // info = await setShortUrl(info)
   info = await getContractInfo(info, p)
-  if (!info.isProxy) {
+  if (info.isProxy) {
     info.riskList.push({risk: true, text: 'upgradeable contract'})
   }
   info = await getSourceCode(info)
   if (!info.isOpenSources) {
-    info.riskList.push({risk: true, text: 'open source type'})
+    info.riskList.push({risk: true, text: 'not opensourced'})
   }
   info = await getRiskListFun(info)
   console.log(info)
