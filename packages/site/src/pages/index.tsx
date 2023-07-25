@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import styled from 'styled-components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
+import { ethers } from 'ethers'
 import {
   connectSnap,
   getSnap,
@@ -11,7 +12,7 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton,
+  ApplyButton,
   Card,
 } from '../components';
 
@@ -56,7 +57,7 @@ const CardContainer = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
-  max-width: 64.8rem;
+  max-width: 100rem;
   width: 100%;
   height: 100%;
   margin-top: 1.5rem;
@@ -69,7 +70,7 @@ const Notice = styled.div`
   border-radius: ${({ theme }) => theme.radii.default};
   padding: 2.4rem;
   margin-top: 2.4rem;
-  max-width: 60rem;
+  max-width: 100rem;
   width: 100%;
 
   & > * {
@@ -99,6 +100,15 @@ const ErrorMessage = styled.div`
   }
 `;
 
+const abi1 = '[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"handSymbol","type":"uint256"},{"indexed":false,"internalType":"address","name":"player","type":"address"}],"name":"BetEvent","type":"event"},{"inputs":[],"name":"_init","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"a","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"a","type":"uint256"},{"internalType":"uint256","name":"b","type":"uint256"}],"name":"add","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"b","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"d","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"input","type":"uint256"}],"name":"s","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"handSymbol","type":"uint256"}],"name":"showHands","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"waitTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]'
+const address1 = '0xf3bf90f6d60df979e43f914ecb60303a2caa3bef'
+
+const abi2 = '[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"handSymbol","type":"uint256"},{"indexed":false,"internalType":"address","name":"player","type":"address"}],"name":"BetEvent","type":"event"},{"inputs":[],"name":"_init","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"a","type":"uint256"},{"internalType":"uint256","name":"b","type":"uint256"}],"name":"add","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"uint256","name":"_waitTime","type":"uint256"}],"name":"adminSetWaitTime","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"count","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_count","type":"uint256"}],"name":"setCount","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"handSymbol","type":"uint256"}],"name":"showHands","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"waitTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]'
+const address2 = '0x9e086c9d8a02565c07043c6e3d5131910bec2e48'
+
+let C1: any = null
+let C2: any = null
+
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
@@ -116,6 +126,38 @@ const Index = () => {
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
+
+  const run1 = async () => {
+    if (!C1) {
+      let web3Provider: any = window.ethereum
+      let provider = new ethers.providers.Web3Provider(web3Provider, "any")
+      await provider.send('eth_requestAccounts', [])
+      let signer = provider.getSigner()
+      C1 = await new ethers.Contract(address1, abi1, signer)
+    }
+    try {
+      let tx = await C1['s'](1)
+      console.log(tx)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  
+  const run2 = async () => {
+    if (!C2) {
+      let web3Provider: any = window.ethereum
+      let provider = new ethers.providers.Web3Provider(web3Provider, "any")
+      await provider.send('eth_requestAccounts', [])
+      let signer = provider.getSigner()
+      C2 = await new ethers.Contract(address2, abi2, signer)
+    }
+    try {
+      let tx = await C2.setCount(1)
+      console.log(tx)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const handleSendHelloClick = async () => {
     try {
@@ -189,8 +231,22 @@ const Index = () => {
             description:
               'Display a custom message within a confirmation screen in MetaMask.',
             button: (
-              <SendHelloButton
-                onClick={handleSendHelloClick}
+              <ApplyButton
+                onClick={run1}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+        />
+        <Card
+          content={{
+            title: 'Send Hello message',
+            description:
+              'Display a custom message within a confirmation screen in MetaMask.',
+            button: (
+              <ApplyButton
+                onClick={run2}
                 disabled={!state.installedSnap}
               />
             ),
