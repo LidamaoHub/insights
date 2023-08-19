@@ -234,9 +234,9 @@ const Index = () => {
         )}
         <Card
           content={{
-            title: 'Send Hello message',
+            title: 'Interacting Proxy Contract',
             description:
-              'Display a custom message within a confirmation screen in MetaMask.',
+              'User try to interact with a proxy contract from an unknown source that has just been updated.',
             button: (
               <ApplyButton
                 onClick={run1}
@@ -248,9 +248,9 @@ const Index = () => {
         />
         <Card
           content={{
-            title: 'Send Hello message',
+            title: 'Interacting Normal Contract',
             description:
-              'Display a custom message within a confirmation screen in MetaMask.',
+              'User try to interact a normal contract',
             button: (
               <ApplyButton
                 onClick={run2}
@@ -259,12 +259,8 @@ const Index = () => {
             ),
           }}
           disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
         />
+        <div style={{width: '250px',height: 0,fontSize:0,overflow:'hidden'}}></div>
         <Notice>
           <p>
             Please note that the <b>snap.manifest.json</b> and{' '}
