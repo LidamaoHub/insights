@@ -178,10 +178,10 @@ const Index = () => {
   return (
     <Container>
       <Heading>
-        Welcome to <Span>template-snap</Span>
+        Welcome to <Span>Horus</Span>
       </Heading>
       <Subtitle>
-        Get started by editing <code>src/index.ts</code>
+        The Horus Captures Bad Contracts  <code>(demo)</code>
       </Subtitle>
       <CardContainer>
         {state.error && (
@@ -261,14 +261,14 @@ const Index = () => {
           disabled={!state.installedSnap}
         />
         <div style={{width: '250px',height: 0,fontSize:0,overflow:'hidden'}}></div>
-        <Notice>
+        {/* <Notice>
           <p>
             Please note that the <b>snap.manifest.json</b> and{' '}
             <b>package.json</b> must be located in the server root directory and
             the bundle must be hosted at the location specified by the location
             field.
           </p>
-        </Notice>
+        </Notice> */}
       </CardContainer>
     </Container>
   );
