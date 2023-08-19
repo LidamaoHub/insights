@@ -5,23 +5,32 @@ import { getContractInfo, setShortUrl, getRiskListFun, getSourceCode } from './u
 
 // Handle outgoing transactions.
 export const onTransaction: OnTransactionHandler = async ({ transaction }) => {
-  let p = await new ethers.providers.Web3Provider(window.ethereum, "any");
+  console.log(transaction)
   let info = {chain: {}, token: '', to: transaction.to, isProxy: false, isOpenSources: false, riskList: []}
-  let network = await p.getNetwork()
-  info.chain = network
-  // info = await setShortUrl(info)
-  info = await getContractInfo(info, p)
-  if (info.isProxy) {
-    info.riskList.push({risk: true, text: 'upgradeable contract'})
+  let isTransaction = true
+  if (transaction.data) {
+    isTransaction = false
+    let p = await new ethers.providers.Web3Provider(window.ethereum, "any");
+    info = {chain: {}, token: '', to: transaction.to, isProxy: false, isOpenSources: false, riskList: []}
+    let network = await p.getNetwork()
+    info.chain = network
+    // info = await setShortUrl(info)
+    info = await getContractInfo(info, p)
+    if (info.isProxy) {
+      info.riskList.push({risk: true, text: 'upgradeable contract'})
+    }
+    info = await getSourceCode(info)
+    if (!info.isOpenSources) {
+      info.riskList.push({risk: true, text: 'not opensourced'})
+    }
+    info = await getRiskListFun(info)
   }
-  info = await getSourceCode(info)
-  if (!info.isOpenSources) {
-    info.riskList.push({risk: true, text: 'not opensourced'})
-  }
-  info = await getRiskListFun(info)
-  console.log(info)
+  
+  console.log(info, isTransaction)
   return {
-    content: panel([
+    content: panel(isTransaction ? [
+      text('NORMAL TRANSACTION')
+    ] : [
       text(
         `${info.riskList.length} risk item`,
       ),
