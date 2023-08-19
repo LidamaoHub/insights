@@ -1,8 +1,7 @@
 {
-  "name": "snap",
-  "version": "0.1.0",
-  "private": true,
-  "description": "The 'Hello, world!' of MetaMask Snaps, now written in TypeScript.",
+  "name": "horus-snap",
+  "version": "0.1.1",
+  "description": "Horus's mission is to build an AI-based auditing snap in metamask snap for user to know about the contract, to make pre-judgments and scoring a user-friendly score for the contract before their transaction.Our team found that users often lack some effective reference when interacting with unknown smart contracts. Deceivers can deploy spoofing contracts to deceive users, such as some unsellable tokens and malicious approve functions,user can see nothing except the address of the contract,giving users more analytics helps them stay away from bad contracts.We gained inspiration from the Google Page Speed tool and constructed Horus.Horus will provide multiple dimensions of information references depending on the contract type, contract deployment information, onchain transactions, blacklist subscription filtering, etc., in some DEX scenarios will be targeted to analyze the tokens",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
@@ -64,6 +63,7 @@
   "engines": {
     "node": ">=16.0.0"
   },
+  "private": false,
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
